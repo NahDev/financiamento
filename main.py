@@ -11,22 +11,18 @@ def calcular_financiamento():
     valor_financiado = valor_carro - entrada
     juros_mensais = taxa_juros / 100 / 12
 
-    # Calcular o valor da parcela sem juros
     valor_parcela_sem_juros = valor_financiado / prazo
 
-    # Criar uma nova planilha no arquivo Excel
     workbook = openpyxl.Workbook()
     sheet = workbook.active
     sheet.title = "Mensalidades"
 
-    # Escrever o cabeçalho
     sheet.cell(row=1, column=1).value = "Mês"
     sheet.cell(row=1, column=2).value = "Valor da Parcela com Juros"
     sheet.cell(row=1, column=3).value = "Valor da Parcela sem Juros"
     sheet.cell(row=1, column=4).value = "Restante a Pagar com Juros"
     sheet.cell(row=1, column=5).value = "Restante a Pagar sem Juros"
 
-    # Calcular e escrever as mensalidades
     for i in range(prazo):
         valor_juros = valor_financiado * juros_mensais
         valor_parcela_com_juros = valor_parcela_sem_juros + valor_juros
@@ -50,17 +46,14 @@ def calcular_financiamento():
         )
     )
 
-    # Salvar o arquivo Excel
     filename = "mensalidades.xlsx"
     workbook.save(filename)
     print("Mensalidades salvas no arquivo:", filename)
 
 
-# Configuração da interface gráfica
 janela = Tk()
 janela.title("Simulação de Financiamento de Carro")
 
-# Campos de entrada
 valor_carro_label = Label(janela, text="Valor do carro:")
 valor_carro_label.pack()
 valor_carro_entry = Entry(janela)
