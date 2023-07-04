@@ -4,21 +4,17 @@ from openpyxl import Workbook
 
 
 def calcular_financiamento():
-    # Obter os valores dos campos de entrada
     valor_carro = float(valor_carro_entry.get())
     taxa_juros = float(taxa_juros_entry.get()) / 100
     parcelas = int(parcelas_entry.get())
 
-    # Cálculos do financiamento
     juros_mensais = taxa_juros / 12
     parcela = (valor_carro * juros_mensais) / (1 - (1 + juros_mensais) ** -parcelas)
 
-    # Criar uma nova planilha do Excel
     wb = Workbook()
     planilha = wb.active
     planilha.title = "Financiamento"
 
-    # Cabeçalho da planilha
     planilha["A1"] = "Mês"
     planilha["B1"] = "Parcela"
     planilha["C1"] = "Juros"
@@ -27,7 +23,6 @@ def calcular_financiamento():
 
     saldo_devedor = valor_carro
 
-    # Preencher os dados da planilha
     for mes in range(1, parcelas + 1):
         juros = saldo_devedor * juros_mensais
         amortizacao = parcela - juros
@@ -39,7 +34,6 @@ def calcular_financiamento():
         planilha["D" + str(mes + 1)] = amortizacao
         planilha["E" + str(mes + 1)] = saldo_devedor
 
-    # Salvar o arquivo Excel
     arquivo_excel = "financiamento_carro.xlsx"
     wb.save(arquivo_excel)
 
@@ -49,11 +43,9 @@ def calcular_financiamento():
     )
 
 
-# Criar a janela principal
 janela = tk.Tk()
 janela.title("Simulação de Financiamento de Carro")
 
-# Criar os campos de entrada
 valor_carro_label = tk.Label(janela, text="Valor do Carro:")
 valor_carro_label.pack()
 valor_carro_entry = tk.Entry(janela)
@@ -69,9 +61,7 @@ parcelas_label.pack()
 parcelas_entry = tk.Entry(janela)
 parcelas_entry.pack()
 
-# Criar o botão de cálculo
 calcular_button = tk.Button(janela, text="Calcular", command=calcular_financiamento)
 calcular_button.pack()
 
-# Executar a janela principal
 janela.mainloop()
