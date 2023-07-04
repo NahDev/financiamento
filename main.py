@@ -1,67 +1,82 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import messagebox
 from openpyxl import Workbook
 
 
 def calcular_financiamento():
-    valor_carro = float(valor_carro_entry.get())
-    taxa_juros = float(taxa_juros_entry.get()) / 100
-    parcelas = int(parcelas_entry.get())
+    # Obter os valores digitados pelo usuário
+    nome_carro = entry_nome.get()
+    valor_carro = float(entry_valor.get())
+    taxa_juros = float(entry_taxa.get())
+    parcelas = int(entry_parcelas.get())
 
-    juros_mensais = taxa_juros / 12
-    parcela = (valor_carro * juros_mensais) / (1 - (1 + juros_mensais) ** -parcelas)
+    # Calcular o valor da parcela e os juros mensais
+    taxa_juros_mensal = taxa_juros / 100 / 12
+    valor_parcela = (valor_carro * taxa_juros_mensal) / (
+        1 - (1 + taxa_juros_mensal) ** -parcelas
+    )
 
+    # Criar uma planilha Excel
     wb = Workbook()
     planilha = wb.active
     planilha.title = "Financiamento"
-
-    planilha["A1"] = "Mês"
-    planilha["B1"] = "Parcela"
+    planilha["A1"] = "Parcela"
+    planilha["B1"] = "Valor Parcela"
     planilha["C1"] = "Juros"
     planilha["D1"] = "Amortização"
-    planilha["E1"] = "Saldo devedor"
+    planilha["E1"] = "Saldo Devedor"
 
     saldo_devedor = valor_carro
 
-    for mes in range(1, parcelas + 1):
-        juros = saldo_devedor * juros_mensais
-        amortizacao = parcela - juros
+    # Preencher a planilha com os valores de cada parcela
+    for i in range(1, parcelas + 1):
+        juros = saldo_devedor * taxa_juros_mensal
+        amortizacao = valor_parcela - juros
         saldo_devedor -= amortizacao
 
-        planilha["A" + str(mes + 1)] = mes
-        planilha["B" + str(mes + 1)] = parcela
-        planilha["C" + str(mes + 1)] = juros
-        planilha["D" + str(mes + 1)] = amortizacao
-        planilha["E" + str(mes + 1)] = saldo_devedor
+        planilha.cell(row=i + 1, column=1, value=i)
+        planilha.cell(row=i + 1, column=2, value=valor_parcela)
+        planilha.cell(row=i + 1, column=3, value=juros)
+        planilha.cell(row=i + 1, column=4, value=amortizacao)
+        planilha.cell(row=i + 1, column=5, value=saldo_devedor)
 
-    arquivo_excel = "financiamento_carro.xlsx"
-    wb.save(arquivo_excel)
-
+    # Salvar o arquivo Excel
+    nome_arquivo = f"{nome_carro}.xlsx"
+    wb.save(nome_arquivo)
     messagebox.showinfo(
-        "Concluído",
-        "O financiamento foi calculado com sucesso e o arquivo Excel foi salvo.",
+        "Financiamento",
+        f"O financiamento foi calculado e salvo no arquivo '{nome_arquivo}'.",
     )
 
 
-janela = tk.Tk()
-janela.title("Simulação de Financiamento de Carro")
+# Criar a interface gráfica com o tkinter
+root = Tk()
+root.title("Simulação de Financiamento")
+root.geometry("400x200")
 
-valor_carro_label = tk.Label(janela, text="Valor do Carro:")
-valor_carro_label.pack()
-valor_carro_entry = tk.Entry(janela)
-valor_carro_entry.pack()
+label_nome = Label(root, text="Nome do Carro:")
+label_nome.pack()
+entry_nome = Entry(root)
+entry_nome.pack()
 
-taxa_juros_label = tk.Label(janela, text="Taxa de Juros (%):")
-taxa_juros_label.pack()
-taxa_juros_entry = tk.Entry(janela)
-taxa_juros_entry.pack()
+label_valor = Label(root, text="Valor do Carro:")
+label_valor.pack()
+entry_valor = Entry(root)
+entry_valor.pack()
 
-parcelas_label = tk.Label(janela, text="Número de Parcelas:")
-parcelas_label.pack()
-parcelas_entry = tk.Entry(janela)
-parcelas_entry.pack()
+label_taxa = Label(root, text="Taxa de Juros (%):")
+label_taxa.pack()
+entry_taxa = Entry(root)
+entry_taxa.pack()
 
-calcular_button = tk.Button(janela, text="Calcular", command=calcular_financiamento)
-calcular_button.pack()
+label_parcelas = Label(root, text="Número de Parcelas:")
+label_parcelas.pack()
+entry_parcelas = Entry(root)
+entry_parcelas.pack()
 
-janela.mainloop()
+button_calcular = Button(
+    root, text="Calcular Financiamento", command=calcular_financiamento
+)
+button_calcular.pack()
+
+root.mainloop()
